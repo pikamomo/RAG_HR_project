@@ -1,0 +1,29 @@
+# ======================= LangChain Core =======================
+LangChain
+langchain-openai
+langchain-qdrant
+langchain-community
+langchain-core
+
+# ======================= Vector Database =======================
+qdrant-client
+
+# ======================= Document Processing =======================
+pypdf
+python-docx
+unstructured
+
+# ======================= Web Scraping =======================
+firecrawl-py
+
+# ======================= User Interface =======================
+gradio
+
+# ======================= OpenAI =======================
+openai
+
+# ======================= Utilities =======================
+python-dotenv
+requests
+numpy
+pandas

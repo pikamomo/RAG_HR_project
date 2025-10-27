@@ -2,10 +2,11 @@ import os
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_qdrant import QdrantVectorStore
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
-from langchain.prompts import PromptTemplate
+
+from langchain_core.prompts import PromptTemplate
 from qdrant_client import QdrantClient
+from langchain_community.chat_message_histories import ConversationBufferMemory
+from langchain_community.chains import ConversationalRetrievalChain
 
 load_dotenv()
 
