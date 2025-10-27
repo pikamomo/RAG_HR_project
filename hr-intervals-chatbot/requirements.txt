@@ -1,0 +1,20 @@
+# Core AI/ML libraries
+openai>=1.12.0
+qdrant-client>=1.7.0
+firecrawl-py>=0.0.5
+
+# Environment and configuration
+python-dotenv>=1.0.0
+
+# Web framework (for chatbot UI)
+streamlit>=1.31.0
+
+# Document processing
+langchain>=0.1.0
+langchain-openai>=0.0.5
+pypdf>=4.0.0
+beautifulsoup4>=4.12.0
+
+# Utilities
+requests>=2.31.0
+
