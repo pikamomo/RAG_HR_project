@@ -1,16 +1,15 @@
+# src/scraper.py
 import os
 from dotenv import load_dotenv
 from firecrawl import FirecrawlApp
 from langchain.schema import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
-from langchain_qdrant import QdrantVectorStore
 from datetime import datetime
+from src.vector_store import process_and_store  # ← 使用共享函数
 
 load_dotenv()
 
 def scrape_url(url):
-    """Scrape webpage content"""
+    """Scrape webpage content using Firecrawl"""
     print(f"🌐 Scraping: {url}")
     
     app = FirecrawlApp(api_key=os.getenv("FIRECRAWL_API_KEY"))
@@ -28,7 +27,7 @@ def process_and_store_webpage(url):
     markdown_content = scrape_url(url)
     print(f"   ✅ Scraped {len(markdown_content)} characters")
     
-    # 2. Create document
+    # 2. Create document with metadata
     doc = Document(
         page_content=markdown_content,
         metadata={
@@ -38,39 +37,7 @@ def process_and_store_webpage(url):
         }
     )
     
-    # 3. Chunk
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
-    )
-    chunks = text_splitter.split_documents([doc])
-    print(f"   ✅ Created {len(chunks)} chunks")
+    # 3. Chunk and store (共享函数)
+    num_chunks = process_and_store([doc])
     
-    # 4. Store
-    embeddings = OpenAIEmbeddings(
-        model=os.getenv("OPEN_AI_EMBEDDING_MODEL")
-    )
-    
-    vectorstore = QdrantVectorStore.from_documents(
-        documents=chunks,
-        embedding=embeddings,
-        url=os.getenv("QDRANT_URL"),
-        api_key=os.getenv("QDRANT_API_KEY"),
-        collection_name=os.getenv("QDRANT_COLLECTION")
-    )
-    
-    print(f"   ✅ Uploaded to Qdrant")
-    return len(chunks)
-
-# Test function
-if __name__ == "__main__":
-    print("🧪 Testing web scraper...")
-    
-    # Test with a simple webpage
-    test_url = "https://example.com"
-    
-    try:
-        num_chunks = process_and_store_webpage(test_url)
-        print(f"\n🎉 Success! Processed {num_chunks} chunks")
-    except Exception as e:
-        print(f"\n❌ Error: {str(e)}")
+    return num_chunks
