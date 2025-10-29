@@ -18,7 +18,7 @@ load_dotenv()
 def get_embeddings():
     """Get OpenAI embeddings instance"""
     return OpenAIEmbeddings(
-        model=os.getenv("OPEN_AI_EMBEDDING_MODEL", "text-embedding-3-large")
+        model=os.getenv("OPEN_AI_EMBEDDING_MODEL", "text-embedding-3-small")
     )
 
 

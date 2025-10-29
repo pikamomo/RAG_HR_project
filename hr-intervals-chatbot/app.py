@@ -14,7 +14,7 @@ load_dotenv()
 
 # Initialize chatbot
 print("🤖 Initializing chatbot...")
-rag_chain = create_rag_chain()
+rag_chain, retriever = create_rag_chain()
 print("✅ Chatbot ready!")
 
 # Generate unique session ID for each user
@@ -57,7 +57,7 @@ def chat_response(message: str, history: list) -> str:
     
     # Get answer from chatbot
     try:
-        answer, sources = ask_question(rag_chain, message, session_id)
+        answer, sources = ask_question(rag_chain, retriever, message, session_id)
         
         # Format response with sources
         response = warning + answer

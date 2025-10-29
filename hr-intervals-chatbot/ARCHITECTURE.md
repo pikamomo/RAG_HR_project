@@ -7,7 +7,7 @@ An AI-powered bilingual chatbot for nonprofit organizations providing HR support
 **Tech Stack:**
 - Backend: Python 3.12 + LangChain
 - Vector Database: Qdrant Cloud
-- AI Models: OpenAI (GPT-4o-mini, text-embedding-3-large)
+- AI Models: OpenAI (GPT-4o-mini, text-embedding-3-small)
 - UI Framework: Gradio
 - Web Scraping: Firecrawl
 - Monitoring: LangSmith (optional)
@@ -195,7 +195,7 @@ ingestion.py: ingest_document()
     │   - type: document/policy/guide
     │   - upload_date: YYYY-MM-DD
     ↓
-    [Generate embeddings] → OpenAI text-embedding-3-large
+    [Generate embeddings] → OpenAI text-embedding-3-small
     ↓
     [Store vectors + metadata] → Qdrant Cloud
     ↓
@@ -224,7 +224,7 @@ scraper.py: process_and_store_webpage()
     ↓
     [Split into chunks] → RecursiveCharacterTextSplitter
     ↓
-    [Generate embeddings] → OpenAI text-embedding-3-large
+    [Generate embeddings] → OpenAI text-embedding-3-small
     ↓
     [Store vectors + metadata] → Qdrant Cloud
     ↓
@@ -249,7 +249,7 @@ chatbot.py: ask_question()
     ↓
 ConversationalRetrievalChain
     ↓
-    [Convert question to embedding] → OpenAI text-embedding-3-large
+    [Convert question to embedding] → OpenAI text-embedding-3-small
     ↓
     [Similarity search] → Qdrant Cloud
     │   - Retrieve top 5 similar chunks
@@ -320,7 +320,7 @@ admin.py: update_document()
 ```bash
 # OpenAI API
 OPENAI_API_KEY=sk-proj-...
-OPEN_AI_EMBEDDING_MODEL=text-embedding-3-large
+OPEN_AI_EMBEDDING_MODEL=text-embedding-3-small
 OPEN_AI_CHAT_MODEL=gpt-4o-mini
 
 # Qdrant Cloud
@@ -366,9 +366,9 @@ hr-intervals-chatbot/
 - **Why:** Built-in web UI, easy document management, free tier
 - **Alternative considered:** Pinecone (limited free tier, no document-level UI)
 
-### 2. Embedding Model: text-embedding-3-large
-- **Dimensions:** 3072 (can be reduced to 1024 for cost)
-- **Why:** Best quality, multilingual support (English/French)
+### 2. Embedding Model: text-embedding-3-small
+- **Dimensions:** 1536
+- **Why:** Excellent quality with best cost-performance ratio, multilingual support (English/French)
 
 ### 3. LLM: GPT-4o-mini
 - **Why:** Cost-effective, sufficient for HR Q&A, fast response
@@ -417,7 +417,7 @@ client.scroll(collection_name, limit=1000, with_payload=True)
 # 1. Load: PyPDFLoader / Docx2txtLoader
 # 2. Chunk: RecursiveCharacterTextSplitter
 # 3. Add metadata: source, type, date
-# 4. Embed: OpenAI text-embedding-3-large
+# 4. Embed: OpenAI text-embedding-3-small
 # 5. Store: QdrantVectorStore.from_documents()
 ```
 
@@ -467,7 +467,7 @@ client.delete(
 ## Performance Considerations
 
 ### Embedding Cost
-- Model: text-embedding-3-large
+- Model: text-embedding-3-small
 - Cost: ~$0.13 per 1M tokens
 - Typical document: 10 pages ≈ 5,000 tokens ≈ $0.0007
 
