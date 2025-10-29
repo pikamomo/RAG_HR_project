@@ -35,12 +35,20 @@ def scrape_url(url: str) -> str:
     print(f"🌐 Scraping: {url}")
     
     app = FirecrawlApp(api_key=os.getenv("FIRECRAWL_API_KEY"))
-    result = app.scrape_url(url, params={'formats': ['markdown']})
+    result = app.scrape(url, formats=['markdown'])
     
-    if not result.get('markdown'):
+    # Handle different return types
+    if hasattr(result, 'markdown'):
+        markdown_content = result.markdown
+    elif isinstance(result, dict) and 'markdown' in result:
+        markdown_content = result['markdown']
+    else:
+        raise ValueError(f"Failed to scrape - unexpected result type: {type(result)}")
+    
+    if not markdown_content:
         raise ValueError("Failed to scrape - no content retrieved")
     
-    return result['markdown']
+    return markdown_content
 
 
 def process_and_store_webpage(url: str) -> int:
