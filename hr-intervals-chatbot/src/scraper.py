@@ -4,10 +4,19 @@ Scrapes web pages using Firecrawl and stores in Qdrant
 """
 
 import os
+import sys
+from pathlib import Path
 from dotenv import load_dotenv
 from firecrawl import FirecrawlApp
 from langchain_core.documents import Document
 from datetime import datetime
+
+# Add parent directory to path for imports
+current_dir = Path(__file__).resolve().parent
+parent_dir = current_dir.parent
+if str(parent_dir) not in sys.path:
+    sys.path.insert(0, str(parent_dir))
+
 from src.vector_store import process_and_store
 
 load_dotenv()
@@ -70,7 +79,7 @@ if __name__ == "__main__":
     print("🧪 Testing web scraper...")
     
     # Test with a simple webpage
-    test_url = "https://example.com"
+    test_url = "https://hrintervals.ca/resources/sample-policy-inclusive-and-equitable-hiring-practices/"
     
     try:
         num_chunks = process_and_store_webpage(test_url)

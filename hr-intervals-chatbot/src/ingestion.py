@@ -4,9 +4,18 @@ Loads PDF/DOCX files and stores them in Qdrant
 """
 
 import os
+import sys
+from pathlib import Path
 from dotenv import load_dotenv
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader
 from datetime import datetime
+
+# Add parent directory to path for imports
+current_dir = Path(__file__).resolve().parent
+parent_dir = current_dir.parent
+if str(parent_dir) not in sys.path:
+    sys.path.insert(0, str(parent_dir))
+
 from src.vector_store import process_and_store
 
 load_dotenv()

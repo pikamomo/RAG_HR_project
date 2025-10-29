@@ -48,17 +48,20 @@ try:
 except Exception as e:
     print(f"   ❌ Firecrawl error: {str(e)}")
 
-# Test 4: LangChain imports
-print("\n4️⃣ Testing LangChain 1.0 imports...")
+# Test 4: LangChain imports (LCEL)
+print("\n4️⃣ Testing LangChain with LCEL imports...")
 try:
     import langchain
     from langchain_openai import ChatOpenAI, OpenAIEmbeddings
     from langchain_qdrant import QdrantVectorStore
-    from langchain_core.prompts import ChatPromptTemplate
-    from langchain.chains import create_retrieval_chain
+    from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+    from langchain_core.runnables.history import RunnableWithMessageHistory
+    from langchain_core.output_parsers import StrOutputParser
+    from langchain_core.documents import Document
+    from operator import itemgetter
     
     print(f"   ✅ LangChain version: {langchain.__version__}")
-    print("   ✅ All LangChain 1.0 imports successful!")
+    print("   ✅ All LangChain LCEL imports successful!")
 except Exception as e:
     print(f"   ❌ LangChain import error: {str(e)}")
 
