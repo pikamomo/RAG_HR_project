@@ -27,7 +27,7 @@ def list_all_documents():
     List all uploaded documents
     
     Returns:
-        List of [name, type, date, chunks] for display
+        HTML table string with selectable content
     """
     try:
         result = client.scroll(
@@ -53,16 +53,84 @@ def list_all_documents():
                 }
             docs_dict[source]["chunks"] += 1
         
-        # Convert to list for Gradio DataFrame
-        docs_list = [
-            [v["name"], v["type"], v["date"], v["chunks"]] 
-            for v in docs_dict.values()
-        ]
+        # Create HTML table with selectable text
+        if not docs_dict or (len(docs_dict) == 1 and "Unknown" in docs_dict):
+            return """
+            <div style="padding: 20px; text-align: center; color: #666;">
+                <p>📂 No documents yet</p>
+            </div>
+            """
         
-        return docs_list if docs_list else [["No documents yet", "", "", 0]]
+        html = """
+        <style>
+            .docs-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+                user-select: text;
+                -webkit-user-select: text;
+                -moz-user-select: text;
+                -ms-user-select: text;
+            }
+            .docs-table thead {
+                background-color: #f8f9fa;
+            }
+            .docs-table th {
+                padding: 12px;
+                text-align: left;
+                font-weight: 600;
+                border-bottom: 2px solid #dee2e6;
+                user-select: text;
+            }
+            .docs-table td {
+                padding: 12px;
+                border-bottom: 1px solid #dee2e6;
+                user-select: text;
+                cursor: text;
+            }
+            .docs-table tr:hover {
+                background-color: #f8f9fa;
+            }
+            .doc-name {
+                color: #0066cc;
+                word-break: break-all;
+            }
+        </style>
+        <table class="docs-table">
+            <thead>
+                <tr>
+                    <th>Document Name</th>
+                    <th>Type</th>
+                    <th>Upload Date</th>
+                    <th>Chunks</th>
+                </tr>
+            </thead>
+            <tbody>
+        """
+        
+        for doc in docs_dict.values():
+            html += f"""
+                <tr>
+                    <td class="doc-name">{doc['name']}</td>
+                    <td>{doc['type']}</td>
+                    <td>{doc['date']}</td>
+                    <td>{doc['chunks']}</td>
+                </tr>
+            """
+        
+        html += """
+            </tbody>
+        </table>
+        """
+        
+        return html
     
     except Exception as e:
-        return [[f"Error: {str(e)}", "", "", 0]]
+        return f"""
+        <div style="padding: 20px; color: #dc3545;">
+            <p>❌ Error: {str(e)}</p>
+        </div>
+        """
 
 
 def upload_document(file, doc_type="document"):
@@ -223,13 +291,12 @@ with gr.Blocks(
         # Tab 1: View Documents
         with gr.Tab("📋 View Documents"):
             gr.Markdown("### Current documents in knowledge base")
+            gr.Markdown("💡 *Tip: You can select and copy any text from the table below*")
             
             refresh_btn = gr.Button("🔄 Refresh List", variant="primary")
-            docs_table = gr.Dataframe(
-                headers=["Document Name", "Type", "Upload Date", "Chunks"],
-                label="Documents",
-                interactive=False,
-                wrap=True
+            
+            docs_table = gr.HTML(
+                label="Documents"
             )
             
             refresh_btn.click(list_all_documents, outputs=docs_table)
