@@ -40,13 +40,15 @@ def list_all_documents():
         docs_dict = {}
         for point in result[0]:
             payload = point.payload
-            source = payload.get("source", "Unknown")
+            # Metadata is nested inside payload
+            metadata = payload.get("metadata", {})
+            source = metadata.get("source", "Unknown")
             
             if source not in docs_dict:
                 docs_dict[source] = {
                     "name": source,
-                    "type": payload.get("type", "Unknown"),
-                    "date": payload.get("upload_date", "Unknown"),
+                    "type": metadata.get("type", "Unknown"),
+                    "date": metadata.get("upload_date", "Unknown"),
                     "chunks": 0
                 }
             docs_dict[source]["chunks"] += 1
@@ -162,7 +164,7 @@ def delete_document(source_name):
                 filter=models.Filter(
                     must=[
                         models.FieldCondition(
-                            key="source",
+                            key="metadata.source",
                             match=models.MatchValue(value=source_name)
                         )
                     ]

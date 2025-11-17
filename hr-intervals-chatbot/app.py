@@ -104,6 +104,7 @@ with gr.Blocks(
         chatbot=gr.Chatbot(
             height=500,
             show_label=False,
+            type='messages',
             avatar_images=(None, "https://em-content.zobj.net/thumbs/120/apple/354/robot_1f916.png")
         ),
         textbox=gr.Textbox(
@@ -119,10 +120,7 @@ with gr.Blocks(
         ],
         title="",
         description="",
-        theme=gr.themes.Soft(),
-        retry_btn=None,
-        undo_btn=None,
-        clear_btn="Clear Conversation"
+        theme=gr.themes.Soft()
     )
     
     # Footer
