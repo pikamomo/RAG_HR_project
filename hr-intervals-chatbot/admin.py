@@ -19,6 +19,18 @@ client = QdrantClient(
 )
 collection_name = os.getenv("QDRANT_COLLECTION")
 
+# Create index for metadata.source to enable filtering
+try:
+    client.create_payload_index(
+        collection_name=collection_name,
+        field_name="metadata.source",
+        field_schema=models.PayloadSchemaType.KEYWORD
+    )
+    print("✅ Payload index for metadata.source created successfully")
+except Exception as e:
+    # Index might already exist or collection not found
+    print(f"ℹ️ Index status: {str(e)}")
+
 
 # ==================== Functions ====================
 
