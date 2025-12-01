@@ -1,5 +1,5 @@
 ---
-title: HR Intervals AI Assistant
+title: HR Intervals Chatbot
 emoji: 💼
 colorFrom: blue
 colorTo: purple
@@ -11,19 +11,17 @@ pinned: false
 
 # HR Intervals AI Assistant
 
-An AI-powered HR assistant that provides instant answers to HR questions using RAG (Retrieval Augmented Generation).
+A RAG-powered chatbot that provides HR knowledge and policy guidance for non-profit organizations.
 
-## Configuration
+## Features
+- 🤖 AI-powered Q&A based on HR knowledge base
+- 📚 Source citations for transparency
+- ⚠️ PII detection and warnings
+- 💬 Interactive chat interface
 
-This app requires the following environment variables to be set in Hugging Face Spaces Settings:
-
+## Setup
+This Space requires the following environment variables to be set:
 - `OPENAI_API_KEY`: Your OpenAI API key
-- `QDRANT_URL`: Your Qdrant instance URL (or use local mode)
-- `QDRANT_API_KEY`: Your Qdrant API key (if using cloud)
-
-## How to Use
-
-1. Ask HR-related questions in the chat interface
-2. Get AI-powered answers based on the knowledge base
-3. View source documents for transparency
+- `QDRANT_URL`: Your Qdrant vector database URL
+- `QDRANT_API_KEY`: Your Qdrant API key
 
