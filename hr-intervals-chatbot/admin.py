@@ -258,36 +258,6 @@ def delete_document(source_name):
         return f"❌ Deletion failed:\n{str(e)}"
 
 
-def update_document(old_source, new_file):
-    """
-    Replace old document with new one
-    
-    Args:
-        old_source: Name of old document
-        new_file: New file to upload
-        
-    Returns:
-        Success message
-    """
-    if not old_source:
-        return "❌ Please enter the old document name"
-    
-    if new_file is None:
-        return "❌ Please select a new file"
-    
-    try:
-        # Delete old
-        delete_result = delete_document(old_source)
-        
-        # Upload new
-        upload_result = upload_document(new_file)
-        
-        return f"🔄 Update Complete\n\n**Step 1 - Delete:**\n{delete_result}\n\n**Step 2 - Upload:**\n{upload_result}"
-    
-    except Exception as e:
-        return f"❌ Update failed:\n{str(e)}"
-
-
 # ==================== Gradio Interface (5.49) ====================
 
 with gr.Blocks(
@@ -393,30 +363,7 @@ with gr.Blocks(
                 outputs=delete_output
             )
         
-        # Tab 5: Update Documents
-        with gr.Tab("🔄 Update Documents"):
-            gr.Markdown("### Replace existing document with new version")
-            
-            old_doc_input = gr.Textbox(
-                label="Old Document Name",
-                placeholder="e.g., old_policy.pdf"
-            )
-            
-            new_file_input = gr.File(
-                label="New File",
-                file_types=[".pdf", ".docx"]
-            )
-            
-            update_btn = gr.Button("🔄 Update", variant="primary", size="lg")
-            update_output = gr.Textbox(label="Update Result", lines=8)
-            
-            update_btn.click(
-                update_document,
-                inputs=[old_doc_input, new_file_input],
-                outputs=update_output
-            )
-        
-        # Tab 6: Help
+        # Tab 5: Help
         with gr.Tab("ℹ️ Help"):
             gr.Markdown("""
             ### Usage Guide
@@ -440,11 +387,7 @@ with gr.Blocks(
             - Enter exact filename or URL
             - Deletes all chunks from that source
             - **Warning**: Cannot be undone!
-            
-            #### 🔄 Update Documents
-            - Enter old document name
-            - Upload new version
-            - Automatically deletes old and uploads new
+            - **Tip**: To update a document, delete it first then upload the new version
             
             ---
             
