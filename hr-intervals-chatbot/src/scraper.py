@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from firecrawl import FirecrawlApp
 from langchain_core.documents import Document
 from datetime import datetime
+from qdrant_client import QdrantClient
 
 # Add parent directory to path for imports
 current_dir = Path(__file__).resolve().parent
@@ -20,6 +21,44 @@ if str(parent_dir) not in sys.path:
 from src.vector_store import process_and_store
 
 load_dotenv()
+
+
+def check_url_exists(url: str) -> int:
+    """
+    Check if URL already exists in Qdrant
+    
+    Args:
+        url: URL to check
+        
+    Returns:
+        Number of existing chunks for this URL (0 if not found)
+    """
+    client = QdrantClient(
+        url=os.getenv("QDRANT_URL"),
+        api_key=os.getenv("QDRANT_API_KEY")
+    )
+    collection_name = os.getenv("QDRANT_COLLECTION")
+    
+    try:
+        result = client.scroll(
+            collection_name=collection_name,
+            limit=1,
+            scroll_filter={
+                "must": [{"key": "metadata.source", "match": {"value": url}}]
+            },
+            with_payload=False
+        )
+        
+        # Count total chunks for this URL
+        count_result = client.count(
+            collection_name=collection_name,
+            count_filter={
+                "must": [{"key": "metadata.source", "match": {"value": url}}]
+            }
+        )
+        return count_result.count
+    except Exception:
+        return 0
 
 
 def scrape_url(url: str) -> str:
@@ -51,16 +90,29 @@ def scrape_url(url: str) -> str:
     return markdown_content
 
 
-def process_and_store_webpage(url: str) -> int:
+def process_and_store_webpage(url: str, force: bool = False) -> int:
     """
     Scrape webpage and store in vector database
     
     Args:
         url: URL to scrape
+        force: If True, skip duplicate check and store anyway
         
     Returns:
         Number of chunks created
+        
+    Raises:
+        ValueError: If URL already exists and force=False
     """
+    
+    # 0. Check if URL already exists
+    if not force:
+        existing_chunks = check_url_exists(url)
+        if existing_chunks > 0:
+            raise ValueError(
+                f"URL already exists with {existing_chunks} chunks. "
+                f"Use 'Delete' to remove it first, or force=True to add anyway."
+            )
     
     # 1. Scrape content
     markdown_content = scrape_url(url)

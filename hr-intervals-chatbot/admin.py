@@ -42,15 +42,27 @@ def list_all_documents():
         HTML table string with selectable content
     """
     try:
-        result = client.scroll(
-            collection_name=collection_name,
-            limit=1000,
-            with_payload=True
-        )
+        # Paginate through ALL points (Qdrant has 5800+ points)
+        all_points = []
+        offset = None
+        
+        while True:
+            result = client.scroll(
+                collection_name=collection_name,
+                limit=1000,
+                offset=offset,
+                with_payload=True
+            )
+            points, next_offset = result
+            all_points.extend(points)
+            
+            if next_offset is None:
+                break
+            offset = next_offset
         
         # Group by source
         docs_dict = {}
-        for point in result[0]:
+        for point in all_points:
             payload = point.payload
             # Metadata is nested inside payload
             metadata = payload.get("metadata", {})

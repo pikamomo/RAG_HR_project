@@ -56,7 +56,7 @@ def chunk_documents(
     return chunks
 
 
-def store_documents(documents: List[Document]) -> int:
+def store_documents(documents: List[Document]) -> tuple[int, int]:
     """
     Store documents in Qdrant vector database
     
@@ -64,19 +64,36 @@ def store_documents(documents: List[Document]) -> int:
         documents: List of Document objects with content and metadata
     
     Returns:
-        Number of chunks stored
+        Tuple of (expected_count, actual_stored_count)
     """
     embeddings = get_embeddings()
+    client = get_qdrant_client()
+    collection_name = os.getenv("QDRANT_COLLECTION")
     
+    # Get count before storing
+    try:
+        before_count = client.count(collection_name=collection_name).count
+    except Exception:
+        before_count = 0
+    
+    # Store documents
     vectorstore = QdrantVectorStore.from_documents(
         documents=documents,
         embedding=embeddings,
         url=os.getenv("QDRANT_URL"),
         api_key=os.getenv("QDRANT_API_KEY"),
-        collection_name=os.getenv("QDRANT_COLLECTION")
+        collection_name=collection_name
     )
     
-    return len(documents)
+    # Verify storage by counting after
+    try:
+        after_count = client.count(collection_name=collection_name).count
+        actual_stored = after_count - before_count
+    except Exception as e:
+        print(f"   ⚠️ Warning: Could not verify storage: {str(e)}")
+        actual_stored = len(documents)  # Assume success if can't verify
+    
+    return len(documents), actual_stored
 
 
 def process_and_store(
@@ -99,8 +116,19 @@ def process_and_store(
     chunks = chunk_documents(documents, chunk_size, chunk_overlap)
     print(f"   ✅ Created {len(chunks)} chunks")
     
-    # 2. Store in Qdrant
-    num_stored = store_documents(chunks)
-    print(f"   ✅ Stored in Qdrant")
-    
-    return num_stored
+    # 2. Store in Qdrant with verification
+    try:
+        expected, actual_stored = store_documents(chunks)
+        
+        if actual_stored == expected:
+            print(f"   ✅ Stored {actual_stored} chunks in Qdrant")
+        elif actual_stored > 0:
+            print(f"   ⚠️ Partial storage: expected {expected}, actually stored {actual_stored}")
+        else:
+            print(f"   ❌ Storage failed: 0 chunks stored (expected {expected})")
+            
+        return actual_stored
+        
+    except Exception as e:
+        print(f"   ❌ Error storing in Qdrant: {str(e)}")
+        raise
