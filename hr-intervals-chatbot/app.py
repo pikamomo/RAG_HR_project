@@ -20,17 +20,6 @@ print("✅ Chatbot ready!")
 # Generate unique session ID for each user
 session_id = str(uuid.uuid4())
 
-# Welcome message with disclaimer - shown at the start of every chat
-WELCOME_DISCLAIMER = """👋 **Welcome to the HR Intervals AI Assistant!**
-
-⚠️ **Important Disclaimer:**
-
-This tool is designed to provide general HR-related information and draft policy suggestions. It is not a substitute for professional legal or HR advice. For legal compliance and to ensure the best outcome for your organization, we recommend consulting a qualified attorney or HR professional before implementing any policies or making decisions based on the information provided.
-
----
-
-How can I help you today?"""
-
 
 def check_pii(text: str) -> bool:
     """
@@ -109,6 +98,22 @@ with gr.Blocks(
         By using this tool, you acknowledge that you understand these limitations.
         """)
     
+    # Welcome message with disclaimer and example questions
+    WELCOME_MESSAGE = """👋 **Welcome to the HR Intervals AI Assistant!**
+
+⚠️ **Important Disclaimer:**
+
+This tool is designed to provide general HR-related information and draft policy suggestions. It is not a substitute for professional legal or HR advice. For legal compliance and to ensure the best outcome for your organization, we recommend consulting a qualified attorney or HR professional before implementing any policies or making decisions based on the information provided.
+
+---
+
+How can I help you today? **Try asking:**
+
+• What should I include in a remote work policy?
+• How do I handle employee terminations properly?
+• What are best practices for hiring in Canada?
+• Tell me about workplace safety requirements"""
+    
     # Chat interface (Gradio 5.x ChatInterface)
     chat_interface = gr.ChatInterface(
         fn=chat_response,
@@ -117,19 +122,13 @@ with gr.Blocks(
             show_label=False,
             type='messages',
             avatar_images=(None, "https://em-content.zobj.net/thumbs/120/apple/354/robot_1f916.png"),
-            value=[{"role": "assistant", "content": WELCOME_DISCLAIMER}]
+            value=[{"role": "assistant", "content": WELCOME_MESSAGE}]
         ),
         textbox=gr.Textbox(
             placeholder="Ask your HR question here...",
             container=False,
             scale=7
         ),
-        examples=[
-            "What should I include in a remote work policy?",
-            "How do I handle employee terminations properly?",
-            "What are best practices for hiring in Canada?",
-            "Tell me about workplace safety requirements"
-        ],
         title="",
         description="",
         theme=gr.themes.Soft()
